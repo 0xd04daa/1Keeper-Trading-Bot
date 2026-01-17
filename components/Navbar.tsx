@@ -3,7 +3,17 @@ import { Search, Wallet, User, ChevronDown } from 'lucide-react';
 
 const Navbar: React.FC = () => {
   const [activeItem, setActiveItem] = useState('Explore');
+  const [isChainOpen, setIsChainOpen] = useState(false);
+  const [selectedChain, setSelectedChain] = useState<'SOL' | 'BNB'>('SOL');
+
   const navItems = ['Explore', 'Pulse', 'Trackers', 'CopyTrade', 'Portfolio', 'Rewards'];
+
+  const chains = [
+      { id: 'SOL', label: 'Solana', icon: 'https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png' },
+      { id: 'BNB', label: 'BNB', icon: 'https://raw.githubusercontent.com/trustwallet/assets/master/blockchains/binance/info/logo.png' }
+  ];
+
+  const currentChain = chains.find(c => c.id === selectedChain) || chains[0];
 
   return (
     <nav className="h-[64px] w-full border-b border-line flex items-center justify-between px-4 bg-bg shrink-0 z-50">
@@ -47,17 +57,43 @@ const Navbar: React.FC = () => {
       {/* Right */}
       <div className="flex items-center gap-3">
         {/* Chain Selector */}
-        <button className="h-[32px] flex items-center gap-2 px-3 bg-btn-default border border-line rounded hover:bg-data-bg-hover transition-colors text-white">
-          <img 
-            src="https://raw.githubusercontent.com/solana-labs/token-list/main/assets/mainnet/So11111111111111111111111111111111111111112/logo.png" 
-            alt="SOL" 
-            width="16" 
-            height="16" 
-            className="rounded-full"
-          />
-          <span className="text-[14px] font-medium">SOL</span>
-          <ChevronDown size={14} className="text-gray-500" />
-        </button>
+        <div className="relative">
+            <button 
+                onClick={() => setIsChainOpen(!isChainOpen)}
+                className="h-[32px] flex items-center gap-2 px-3 bg-btn-default border border-line rounded hover:bg-data-bg-hover transition-colors text-white"
+            >
+            <img 
+                src={currentChain.icon} 
+                alt={currentChain.id} 
+                width="16" 
+                height="16" 
+                className="rounded-full"
+            />
+            <span className="text-[14px] font-medium">{currentChain.id}</span>
+            <ChevronDown size={14} className={`text-gray-500 transition-transform ${isChainOpen ? 'rotate-180' : ''}`} />
+            </button>
+            
+            {isChainOpen && (
+                <>
+                <div className="fixed inset-0 z-40" onClick={() => setIsChainOpen(false)}></div>
+                <div className="absolute top-full right-0 mt-2 w-[140px] bg-[#1e1e1e] border border-line rounded-lg shadow-xl z-50 overflow-hidden py-1">
+                    {chains.map((chain) => (
+                        <button
+                            key={chain.id}
+                            onClick={() => {
+                                setSelectedChain(chain.id as 'SOL' | 'BNB');
+                                setIsChainOpen(false);
+                            }}
+                            className="flex items-center gap-3 w-full px-3 py-2 hover:bg-[#2B2D2E] transition-colors text-left"
+                        >
+                            <img src={chain.icon} alt={chain.label} width="18" height="18" className="rounded-full" />
+                            <span className="text-[14px] text-gray-200">{chain.label}</span>
+                        </button>
+                    ))}
+                </div>
+                </>
+            )}
+        </div>
 
         {/* Deposit */}
         <button className="h-[32px] px-4 bg-[#0078D4] text-white text-sm font-bold rounded hover:bg-[#006cbd] transition-colors flex items-center justify-center">
